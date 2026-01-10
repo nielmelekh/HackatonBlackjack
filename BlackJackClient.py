@@ -142,7 +142,7 @@ def start_client():
         data, addr = udp_sock.recvfrom(1024)
         offer = unpack_offer(data)
         if offer and offer[0] == MAGIC_COOKIE and offer[1] == MSG_TYPE_OFFER:
-            print(f"Received offer from {addr}")
+            print(f"Received offer from {addr[0]}")
             try:
                 rounds = int(input("How many rounds? "))
             except:
