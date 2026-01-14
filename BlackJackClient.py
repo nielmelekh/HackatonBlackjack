@@ -3,12 +3,12 @@ import struct
 import sys
 import time
 from Utilities import *
-from Deck import hand_value, format_card  # Import shared logic
+from Deck import hand_value, format_card
 
 TEAM_NAME = "ThunderCobras"
 
 
-# --- Helpers ---
+# Helpers
 def unpack_offer(data):
     try:
         cookie, msg_type, port, name_bytes = struct.unpack('!IBH32s', data)
@@ -35,7 +35,6 @@ def unpack_server_payload(data):
         return None
 
 
-# --- Game Logic ---
 def play_session(ip, port, rounds):
     tcp_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:

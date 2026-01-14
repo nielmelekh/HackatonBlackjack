@@ -3,7 +3,7 @@ import struct
 import threading
 import time
 from Utilities import *
-from Deck import Deck, hand_value  # Imported shared logic
+from Deck import Deck, hand_value
 
 SERVER_NAME = "Dealer"
 

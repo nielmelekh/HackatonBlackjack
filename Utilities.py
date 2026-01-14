@@ -1,5 +1,3 @@
-# --- Configuration & Constants ---
-
 UDP_PORT = 13122  # Hardcoded in assignment
 
 MAGIC_COOKIE = 0xabcddcba
