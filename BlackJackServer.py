@@ -8,7 +8,7 @@ from Deck import Deck, hand_value
 SERVER_NAME = "Dealer"
 
 
-# --- Protocol Helpers ---
+# Helpers functions
 def pack_offer(tcp_port, name):
     padded_name = name.encode('utf-8').ljust(32, b'\x00')[:32]
     return struct.pack('!IBH32s', MAGIC_COOKIE, MSG_TYPE_OFFER, tcp_port, padded_name)
@@ -34,7 +34,7 @@ def unpack_client_payload(data):
         return None
 
 
-# --- Networking ---
+# Networking
 def udp_broadcast_thread(tcp_port):
     udp_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
     udp_sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -42,7 +42,6 @@ def udp_broadcast_thread(tcp_port):
     offer_packet = pack_offer(tcp_port, SERVER_NAME)
 
     print(f"{GREEN}Server started, listening on IP address {socket.gethostbyname(socket.gethostname())}{RESET}")
-    # print(f"Broadcasting offers with TCP port {tcp_port}")
 
     while True:
         try:
@@ -73,7 +72,6 @@ def handle_client(conn, addr):
             player_hand = []
             dealer_hand = []
 
-            # -- Initial Deal --
             p_card1 = deck.draw()
             player_hand.append(p_card1)
             conn.sendall(pack_server_payload(0, p_card1[0], p_card1[1]))
@@ -89,7 +87,7 @@ def handle_client(conn, addr):
             d_card2 = deck.draw()
             dealer_hand.append(d_card2)  # Hidden initially
 
-            # -- Player Turn --
+            # Player Turn
             player_active = True
             player_bust = False
 
@@ -118,12 +116,12 @@ def handle_client(conn, addr):
                 except Exception:
                     return
 
-            # -- Dealer Turn --
+            # Dealer Turn
             if not player_bust:
-                # 1. Reveal the hidden card first!
+                # Reveal the hidden card
                 conn.sendall(pack_server_payload(0, d_card2[0], d_card2[1]))
 
-                # 2. Dealer logic: Hit until >= 17 using shared logic
+                # Hit until sum >= 17
                 dealer_bust = False
                 while hand_value(dealer_hand) < 17:
                     new_d_card = deck.draw()
@@ -164,13 +162,13 @@ def handle_client(conn, addr):
 
 
 def start_server():
-    # 1) Create TCP socket and let OS choose a free port (bind port 0)
+    # Create TCP socket and let OS choose a free port
     tcp_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    tcp_sock.bind(('', 0))  # 0 => OS picks an available port
+    tcp_sock.bind(('', 0))  # picks an available port
     tcp_port = tcp_sock.getsockname()[1]
     tcp_sock.listen(5)
 
-    # 2) Start UDP broadcast thread with the chosen TCP port
+    # Start UDP broadcast thread with the chosen TCP port
     udp_thread = threading.Thread(target=udp_broadcast_thread, args=(tcp_port,), daemon=True)
     udp_thread.start()
 
